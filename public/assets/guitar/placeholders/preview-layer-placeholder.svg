@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Guitar preview layer placeholder</title>
+  <desc id="desc">A transparent placeholder layer for future realistic guitar preview assets.</desc>
+  <rect width="900" height="1200" fill="none"/>
+  <g opacity="0.2">
+    <ellipse cx="450" cy="1070" rx="260" ry="42" fill="#18181b"/>
+    <rect x="420" y="155" width="60" height="610" rx="30" fill="#a1a1aa"/>
+    <path d="M372 176c28-44 93-42 119 2 21 36 1 88-37 105-43 20-99-14-99-62 0-16 5-31 17-45Z" fill="#a1a1aa"/>
+    <path d="M260 636c-75 53-106 155-67 238 44 94 161 139 265 100 44-16 75-46 94-82 27 18 66 18 95-3 46-34 52-100 14-143-31-35-82-43-121-21-25-61-83-106-152-115-45-6-90 3-128 26Z" fill="#a1a1aa"/>
+  </g>
+</svg>
