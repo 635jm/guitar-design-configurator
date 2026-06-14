@@ -270,7 +270,7 @@ export function getRenderableThumbnailPath(
   category: GuitarAssetCategory,
   option: string,
 ) {
-  return getOptionAsset(category, option).fallbackThumbnailPath;
+  return getOptionAsset(category, option).thumbnailPath;
 }
 
 export function getPreviewLayers(config: GuitarConfig): PreviewLayerSet {

@@ -1,5 +1,7 @@
 import {
   getOptionAsset,
+  getRenderableThumbnailPath,
+  THUMBNAIL_PLACEHOLDER,
   type GuitarAssetCategory,
   type GuitarOptionAsset,
 } from "@/lib/guitar-assets";
@@ -64,6 +66,28 @@ function getThumbnailStyle(field: keyof GuitarConfig, option: string) {
 }
 
 function Thumbnail({ field, option }: { field: keyof GuitarConfig; option: string }) {
+  const asset = getCardAsset(field, option);
+
+  if (asset) {
+    return (
+      <img
+        src={getRenderableThumbnailPath(getAssetCategory(field)!, option)}
+        alt=""
+        aria-hidden="true"
+        className="h-full w-full rounded-md object-cover"
+        onError={(event) => {
+          const image = event.currentTarget;
+
+          if (image.src.endsWith(THUMBNAIL_PLACEHOLDER)) {
+            return;
+          }
+
+          image.src = THUMBNAIL_PLACEHOLDER;
+        }}
+      />
+    );
+  }
+
   const style = getThumbnailStyle(field, option);
 
   if (style) {
