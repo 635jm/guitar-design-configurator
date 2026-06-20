@@ -6,18 +6,35 @@ type OptionGridProps = {
   value: string;
   options: readonly string[];
   onChange: (field: keyof GuitarConfig, value: string) => void;
+  viewMode?: "grid" | "list";
 };
 
-export function OptionGrid({ field, value, options, onChange }: OptionGridProps) {
+export function OptionGrid({
+  field,
+  value,
+  options,
+  onChange,
+  viewMode = "grid",
+}: OptionGridProps) {
   return (
-    <div className="grid grid-cols-2 gap-2 min-[390px]:grid-cols-3 sm:grid-cols-4 xl:grid-cols-5">
+    <div
+      className={
+        viewMode === "list"
+          ? "grid grid-cols-2 gap-1.5"
+          : "grid grid-cols-2 gap-1.5 min-[420px]:grid-cols-3 sm:grid-cols-4"
+      }
+    >
       {options.map((option) => (
         <OptionCard
           key={option}
           field={field}
           option={option}
           selected={value === option}
-          onSelect={() => onChange(field, option)}
+          onSelect={() => {
+            if (option !== "Show more") {
+              onChange(field, option);
+            }
+          }}
         />
       ))}
     </div>

@@ -5,6 +5,7 @@ export type AssetPath = `/${string}`;
 export type GuitarAssetCategory =
   | "bodyShape"
   | "bodyMaterial"
+  | "neckMaterial"
   | "bodyColor"
   | "pickguard"
   | "pickups"
@@ -62,7 +63,11 @@ const slugByLabel: Record<string, string> = {
   "PRS Style": "prs-style",
   "Custom Offset": "custom-offset",
   "C Shape": "c-shape",
+  C: "c",
+  D: "d",
   "Modern C": "modern-c",
+  V: "v",
+  U: "u",
   "Soft V": "soft-v",
   "U Shape": "u-shape",
   "D Shape": "d-shape",
@@ -85,12 +90,20 @@ const slugByLabel: Record<string, string> = {
   "Shell Pink": "shell-pink",
   "Matte Black": "matte-black",
   "Transparent Blue": "transparent-blue",
+  "Sonic Blue": "sonic-blue",
+  "Trans Black": "trans-black",
+  "Deep Ocean Blue": "deep-ocean-blue",
   "Custom Color": "custom-color",
   White: "white",
+  "White 1-Ply": "white-1-ply",
   Tortoise: "tortoise",
+  "Black 3-Ply": "black-3-ply",
+  "Tortoise 4-Ply": "tortoise-4-ply",
   "Mint Green": "mint-green",
+  "Mint Green 3-Ply": "mint-green-3-ply",
   Pearl: "pearl",
   None: "none",
+  "Single Coil SSS": "single-coil-sss",
   SSS: "sss",
   HSS: "hss",
   HH: "hh",
@@ -98,6 +111,8 @@ const slugByLabel: Record<string, string> = {
   HSH: "hsh",
   Hardtail: "hardtail",
   "Tune-o-matic": "tune-o-matic",
+  "2-Point Tremolo": "two-point-tremolo",
+  "6-Saddle Tremolo": "six-saddle-tremolo",
   "2-point Tremolo": "two-point-tremolo",
   "Floyd Rose": "floyd-rose",
   Bigsby: "bigsby",
@@ -204,11 +219,19 @@ export const guitarAssetMap = {
     "body-materials",
     "materials",
   ),
+  neckMaterial: makeAssetGroup(
+    ["Maple", "Roasted Maple", "Mahogany", "Wenge"],
+    "body-materials",
+    "materials",
+  ),
   bodyColor: makeAssetGroup(
     [
+      "Sonic Blue",
+      "Olympic White",
+      "Trans Black",
+      "Deep Ocean Blue",
       "Sunburst",
       "Black",
-      "Olympic White",
       "Candy Apple Red",
       "Natural",
       "Surf Green",
@@ -221,17 +244,36 @@ export const guitarAssetMap = {
     "finishes",
   ),
   pickguard: makeAssetGroup(
-    ["White", "Black", "Tortoise", "Mint Green", "Pearl", "None"],
+    [
+      "White 1-Ply",
+      "Black 3-Ply",
+      "Tortoise 4-Ply",
+      "Mint Green 3-Ply",
+      "White",
+      "Black",
+      "Tortoise",
+      "Mint Green",
+      "Pearl",
+      "None",
+    ],
     "pickguards",
     "pickguards",
   ),
   pickups: makeAssetGroup(
-    ["SSS", "HSS", "HH", "P90", "HSH"],
+    ["Single Coil SSS", "SSS", "HSS", "HH", "P90", "HSH"],
     "pickups",
     "pickups",
   ),
   bridgeType: makeAssetGroup(
-    ["Hardtail", "Tune-o-matic", "2-point Tremolo", "Floyd Rose", "Bigsby"],
+    [
+      "2-Point Tremolo",
+      "Hardtail",
+      "6-Saddle Tremolo",
+      "Tune-o-matic",
+      "2-point Tremolo",
+      "Floyd Rose",
+      "Bigsby",
+    ],
     "bridges",
     "bridges",
   ),
@@ -303,6 +345,7 @@ function categoryToThumbnailFolder(category: GuitarAssetCategory) {
   const folders: Record<GuitarAssetCategory, string> = {
     bodyShape: "body-shapes",
     bodyMaterial: "body-materials",
+    neckMaterial: "body-materials",
     bodyColor: "finishes",
     pickguard: "pickguards",
     pickups: "pickups",

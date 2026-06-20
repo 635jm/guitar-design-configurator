@@ -2,11 +2,13 @@ export type GuitarConfig = {
   bodyShape: string;
   neckShape: string;
   bodyMaterial: string;
+  neckMaterial: string;
   hardwareFinish: string;
   bodyColor: string;
   pickups: string;
   bridgeType: string;
   pickguard: string;
+  knobs: string;
 };
 
 export type GuitarProject = {
@@ -31,11 +33,13 @@ export const defaultConfig: GuitarConfig = {
   bodyShape: "Stratocaster",
   neckShape: "Modern C",
   bodyMaterial: "Alder",
+  neckMaterial: "Maple",
   hardwareFinish: "Chrome",
-  bodyColor: "Olympic White",
-  pickups: "SSS",
-  bridgeType: "2-point Tremolo",
-  pickguard: "White",
+  bodyColor: "Trans Black",
+  pickups: "Single Coil SSS",
+  bridgeType: "2-Point Tremolo",
+  pickguard: "Black 3-Ply",
+  knobs: "Volume Taper",
 };
 
 export const guitarPresets: Record<string, GuitarConfig> = {
@@ -43,41 +47,49 @@ export const guitarPresets: Record<string, GuitarConfig> = {
     bodyShape: "Stratocaster",
     neckShape: "Modern C",
     bodyMaterial: "Alder",
+    neckMaterial: "Maple",
     hardwareFinish: "Chrome",
-    bodyColor: "Olympic White",
-    pickups: "SSS",
-    bridgeType: "2-point Tremolo",
-    pickguard: "White",
+    bodyColor: "Trans Black",
+    pickups: "Single Coil SSS",
+    bridgeType: "2-Point Tremolo",
+    pickguard: "Black 3-Ply",
+    knobs: "Volume Taper",
   },
   "Vintage Tele": {
     bodyShape: "Telecaster",
     neckShape: "Chunky Vintage",
     bodyMaterial: "Ash",
+    neckMaterial: "Roasted Maple",
     hardwareFinish: "Nickel",
     bodyColor: "Natural",
-    pickups: "SSS",
+    pickups: "Single Coil SSS",
     bridgeType: "Hardtail",
-    pickguard: "Black",
+    pickguard: "Black 3-Ply",
+    knobs: "Tone Taper",
   },
   "Modern Metal": {
     bodyShape: "Explorer",
     neckShape: "Thin Wizard",
     bodyMaterial: "Mahogany",
+    neckMaterial: "Wenge",
     hardwareFinish: "Black",
     bodyColor: "Matte Black",
     pickups: "HH",
     bridgeType: "Floyd Rose",
     pickguard: "None",
+    knobs: "Dome Metal",
   },
   "Jazz Custom": {
     bodyShape: "Jazzmaster",
     neckShape: "Soft V",
     bodyMaterial: "Maple Top",
+    neckMaterial: "Mahogany",
     hardwareFinish: "Gold",
     bodyColor: "Sunburst",
     pickups: "P90",
     bridgeType: "Bigsby",
     pickguard: "Tortoise",
+    knobs: "Skirted Metal",
   },
 };
 
@@ -94,8 +106,12 @@ export const guitarOptions = {
     "Custom Offset",
   ],
   neckShape: [
-    "C Shape",
+    "C",
+    "D",
     "Modern C",
+    "V",
+    "U",
+    "C Shape",
     "Soft V",
     "U Shape",
     "D Shape",
@@ -112,6 +128,7 @@ export const guitarOptions = {
     "Chambered Body",
     "Carbon Fiber",
   ],
+  neckMaterial: ["Maple", "Roasted Maple", "Mahogany", "Wenge"],
   hardwareFinish: [
     "Chrome",
     "Nickel",
@@ -123,9 +140,12 @@ export const guitarOptions = {
     "Brass",
   ],
   bodyColor: [
+    "Sonic Blue",
+    "Olympic White",
+    "Trans Black",
+    "Deep Ocean Blue",
     "Sunburst",
     "Black",
-    "Olympic White",
     "Candy Apple Red",
     "Natural",
     "Surf Green",
@@ -134,29 +154,37 @@ export const guitarOptions = {
     "Transparent Blue",
     "Custom Color",
   ],
-  pickups: ["SSS", "HSS", "HH", "P90", "HSH"],
+  pickups: ["Single Coil SSS", "HSS", "HH", "P90", "HSH"],
   bridgeType: [
+    "2-Point Tremolo",
     "Hardtail",
+    "6-Saddle Tremolo",
     "Tune-o-matic",
     "2-point Tremolo",
     "Floyd Rose",
     "Bigsby",
   ],
-  pickguard: ["White", "Black", "Tortoise", "Mint Green", "Pearl", "None"],
+  pickguard: ["White 1-Ply", "Black 3-Ply", "Tortoise 4-Ply", "Mint Green 3-Ply", "None", "White", "Black", "Tortoise", "Pearl"],
+  knobs: ["Volume Taper", "Tone Taper", "Dome Metal", "Skirted Metal", "Show more"],
 } as const;
 
 export const optionLabels: Record<keyof GuitarConfig, string> = {
   bodyShape: "Body shape",
   neckShape: "Neck shape",
-  bodyMaterial: "Body wood / material",
-  hardwareFinish: "Hardware finish",
-  bodyColor: "Body finish",
+  bodyMaterial: "Body Material",
+  neckMaterial: "Neck material",
+  hardwareFinish: "Hardware Finish",
+  bodyColor: "Finish",
   pickups: "Pickups",
-  bridgeType: "Bridge type",
+  bridgeType: "Bridge",
   pickguard: "Pickguard",
+  knobs: "Knobs",
 };
 
 export const bodyColorSwatches: Record<string, string> = {
+  "Sonic Blue": "#c7e5ed",
+  "Trans Black": "linear-gradient(135deg, #151515, #050505 55%, #303030)",
+  "Deep Ocean Blue": "linear-gradient(135deg, #12384c, #0b516e)",
   Sunburst: "linear-gradient(135deg, #2b1307, #c66a1f 45%, #f5c35c 72%, #1b1008)",
   Black: "#050505",
   "Olympic White": "#f2eee3",
@@ -343,11 +371,13 @@ export function buildSummary(project: GuitarProject) {
     `Body Shape: ${project.config.bodyShape}`,
     `Neck Shape: ${project.config.neckShape}`,
     `Body Wood / Material: ${project.config.bodyMaterial}`,
+    `Neck Material: ${project.config.neckMaterial}`,
     `Hardware Finish: ${project.config.hardwareFinish}`,
     `Body Color / Finish: ${project.config.bodyColor}`,
     `Pickups: ${project.config.pickups}`,
     `Bridge Type: ${project.config.bridgeType}`,
     `Pickguard: ${project.config.pickguard}`,
+    `Knobs: ${project.config.knobs}`,
   ]
     .filter(Boolean)
     .join("\n");
@@ -358,7 +388,7 @@ export function buildImagePrompt(project: GuitarProject) {
 
   return [
     `Create a premium product render for a custom ${project.guitarType} named "${project.name}".`,
-    `Design details: ${config.bodyShape} body shape, ${config.bodyMaterial} body material, ${config.bodyColor} body finish, ${config.neckShape} neck profile, ${config.pickups} pickup configuration, ${config.bridgeType} bridge, ${config.hardwareFinish} hardware, and ${config.pickguard} pickguard.`,
+    `Design details: ${config.bodyShape} body shape, ${config.bodyMaterial} body material, ${config.bodyColor} body finish, ${config.neckShape} neck profile, ${config.neckMaterial} neck material, ${config.pickups} pickup configuration, ${config.bridgeType} bridge, ${config.hardwareFinish} hardware, ${config.pickguard} pickguard, and ${config.knobs} knobs.`,
     "Composition: front three-quarter view on a clean studio backdrop, realistic wood and metal materials, crisp hardware reflections, accurate guitar proportions, and soft luthier workshop lighting.",
     "Style: high-detail commercial instrument photography, polished but believable, ready for a builder brief or product concept board.",
   ].join(" ");

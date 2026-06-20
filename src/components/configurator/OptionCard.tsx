@@ -1,11 +1,10 @@
 import {
   getOptionAsset,
-  getRenderableThumbnailPath,
-  THUMBNAIL_PLACEHOLDER,
   type GuitarAssetCategory,
   type GuitarOptionAsset,
 } from "@/lib/guitar-assets";
 import { bodyColorSwatches, type GuitarConfig } from "@/lib/guitars";
+import { IconCheck, IconDots, IconMinus } from "@tabler/icons-react";
 
 type OptionCardProps = {
   field: keyof GuitarConfig;
@@ -20,12 +19,18 @@ const woodSwatches: Record<string, string> = {
   Mahogany: "linear-gradient(135deg,#4f1d0d,#8d3f16)",
   Basswood: "linear-gradient(135deg,#e7bd80,#f7dfb6)",
   "Maple Top": "linear-gradient(135deg,#e8c984,#fff0bd)",
+  Maple: "linear-gradient(135deg,#f5d9a8,#fff2d2 48%,#d4a05e)",
+  "Roasted Maple": "linear-gradient(135deg,#8c4a19,#c47c37 55%,#71330f)",
   Walnut: "linear-gradient(135deg,#4f2e1f,#9a6a43)",
   "Chambered Body": "linear-gradient(135deg,#d5a55d,#80502f)",
   "Carbon Fiber": "repeating-linear-gradient(45deg,#20242b 0 6px,#111318 6px 12px)",
 };
 
 const pickguardSwatches: Record<string, string> = {
+  "White 1-Ply": "#f8f7f3",
+  "Black 3-Ply": "radial-gradient(circle at 30% 30%,#526071,#111827 32%,#0a0a0a 70%)",
+  "Tortoise 4-Ply": "linear-gradient(135deg,#2b1208,#8d3a17,#d08b45)",
+  "Mint Green 3-Ply": "#d9eadf",
   White: "#f8f6ef",
   Black: "#161616",
   Tortoise: "linear-gradient(135deg,#2b1208,#8d3a17,#d08b45)",
@@ -50,7 +55,7 @@ function getThumbnailStyle(field: keyof GuitarConfig, option: string) {
     return { background: bodyColorSwatches[option] ?? "#e5e7eb" };
   }
 
-  if (field === "bodyMaterial") {
+  if (field === "bodyMaterial" || field === "neckMaterial") {
     return { background: woodSwatches[option] ?? "#e5e7eb" };
   }
 
@@ -66,26 +71,8 @@ function getThumbnailStyle(field: keyof GuitarConfig, option: string) {
 }
 
 function Thumbnail({ field, option }: { field: keyof GuitarConfig; option: string }) {
-  const asset = getCardAsset(field, option);
-
-  if (asset) {
-    return (
-      <img
-        src={getRenderableThumbnailPath(getAssetCategory(field)!, option)}
-        alt=""
-        aria-hidden="true"
-        className="h-full w-full rounded-md object-cover"
-        onError={(event) => {
-          const image = event.currentTarget;
-
-          if (image.src.endsWith(THUMBNAIL_PLACEHOLDER)) {
-            return;
-          }
-
-          image.src = THUMBNAIL_PLACEHOLDER;
-        }}
-      />
-    );
+  if (option === "Show more") {
+    return <IconDots aria-hidden="true" className="h-5 w-5 text-zinc-500" stroke={1.8} />;
   }
 
   const style = getThumbnailStyle(field, option);
@@ -96,16 +83,16 @@ function Thumbnail({ field, option }: { field: keyof GuitarConfig; option: strin
 
   if (field === "bodyShape") {
     return (
-      <span className="relative h-12 w-12 rounded-[48%_34%_44%_46%/50%_38%_56%_44%] bg-zinc-400 shadow-inner">
-        <span className="absolute left-8 top-5 h-2 w-8 rounded-full bg-zinc-400" />
+      <span className="relative h-11 w-11 rounded-[48%_34%_44%_46%/50%_38%_56%_44%] bg-zinc-400 shadow-inner">
+        <span className="absolute left-7 top-5 h-2 w-7 rounded-full bg-zinc-400" />
       </span>
     );
   }
 
   if (field === "neckShape") {
     return (
-      <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-zinc-700">
-        {option.replace(" Shape", "").slice(0, 8)}
+      <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-zinc-950">
+        {option.replace(" Shape", "").replace("Soft ", "").slice(0, 8)}
       </span>
     );
   }
@@ -113,7 +100,7 @@ function Thumbnail({ field, option }: { field: keyof GuitarConfig; option: strin
   if (field === "pickups") {
     return (
       <span className="flex items-center gap-1">
-        {option.split("").map((letter, index) => (
+        {option.replace("Single Coil ", "").split("").map((letter, index) => (
           <span
             key={`${letter}-${index}`}
             className={`block rounded-sm bg-zinc-900 ${
@@ -125,8 +112,18 @@ function Thumbnail({ field, option }: { field: keyof GuitarConfig; option: strin
     );
   }
 
+  if (field === "knobs") {
+    return (
+      <span className="grid h-9 w-9 place-items-center rounded-full border border-zinc-300 bg-[radial-gradient(circle_at_35%_28%,#f8fafc,#bfc4ca_48%,#8d939b)] shadow-inner">
+        <span className="h-4 w-px rotate-45 rounded-full bg-zinc-500" />
+      </span>
+    );
+  }
+
   return (
-    <span className="h-6 w-12 rounded border border-zinc-400 bg-[linear-gradient(135deg,#f8fafc,#cbd5e1)] shadow-sm" />
+    <span className="grid h-8 w-12 place-items-center rounded border border-zinc-200 bg-zinc-50 shadow-sm">
+      <IconMinus aria-hidden="true" className="h-4 w-4 text-zinc-400" stroke={1.8} />
+    </span>
   );
 }
 
@@ -135,7 +132,7 @@ function getAssetCategory(field: keyof GuitarConfig): GuitarAssetCategory | unde
     return undefined;
   }
 
-  return field;
+  return field as GuitarAssetCategory;
 }
 
 function getCardAsset(
@@ -154,33 +151,24 @@ export function OptionCard({ field, option, selected, onSelect }: OptionCardProp
     <button
       type="button"
       onClick={onSelect}
-      className={`group relative flex h-[88px] min-w-0 flex-col items-center justify-between rounded-lg border bg-white p-2 text-center text-[11px] font-semibold leading-tight shadow-sm transition sm:h-[92px] ${
+      className={`group relative flex h-[76px] min-w-0 flex-col items-center justify-between rounded-lg border bg-white p-1.5 text-center text-[10px] font-semibold leading-tight shadow-sm transition ${
         selected
-          ? "border-blue-500 ring-2 ring-blue-500/15"
+          ? "border-blue-500 bg-blue-50/20 ring-2 ring-blue-500/12"
           : "border-zinc-200 hover:border-blue-200 hover:shadow-md"
       }`}
       aria-pressed={selected}
       data-thumbnail-path={asset?.thumbnailPath}
       data-preview-layer-path={asset?.previewLayerPath}
     >
-      <span className="grid h-11 w-full place-items-center overflow-hidden rounded-md bg-zinc-100 sm:h-12">
+      <span className="grid h-10 w-full place-items-center overflow-hidden rounded-md bg-zinc-50">
         <Thumbnail field={field} option={option} />
       </span>
-      <span className="line-clamp-2 max-w-full text-zinc-700">{option}</span>
+      <span className="line-clamp-2 max-w-full text-zinc-700">
+        {option.replace("Single Coil ", "")}
+      </span>
       {selected ? (
-        <span className="absolute right-1.5 top-1.5 grid h-4 w-4 place-items-center rounded-full bg-blue-600 text-white">
-          <svg
-            aria-hidden="true"
-            className="h-2.5 w-2.5"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2.5"
-            viewBox="0 0 16 16"
-          >
-            <path d="m3 8 3 3 7-7" />
-          </svg>
+        <span className="absolute right-1 top-1 grid h-4 w-4 place-items-center rounded-full bg-blue-600 text-white">
+          <IconCheck aria-hidden="true" className="h-2.5 w-2.5" stroke={2.6} />
         </span>
       ) : null}
     </button>

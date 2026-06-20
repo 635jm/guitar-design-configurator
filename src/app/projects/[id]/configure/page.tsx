@@ -9,6 +9,7 @@ import { OptionSection } from "@/components/configurator/OptionSection";
 import { GuitarPreviewPanel } from "@/components/preview/GuitarPreviewPanel";
 import {
   buildProjectJsonFileName,
+  defaultConfig,
   formatProjectDateTime,
   getProject,
   guitarOptions,
@@ -16,26 +17,54 @@ import {
   type GuitarProject,
   type GuitarConfig,
 } from "@/lib/guitars";
+import { IconCode, IconDeviceFloppy, IconFileText } from "@tabler/icons-react";
 
 const optionFields: Array<keyof GuitarConfig> = [
   "bodyShape",
   "neckShape",
   "bodyMaterial",
+  "neckMaterial",
   "bodyColor",
   "pickguard",
   "pickups",
   "bridgeType",
   "hardwareFinish",
+  "knobs",
 ];
+
+function createDemoProject(): GuitarProject {
+  const now = new Date().toISOString();
+
+  return {
+    id: "demo",
+    name: "Modern S Custom",
+    guitarType: "Electric Guitar",
+    notes: "Medium thickness with modern playability.",
+    createdAt: now,
+    updatedAt: now,
+    config: { ...defaultConfig },
+  };
+}
 
 export default function ConfigureProjectPage() {
   const params = useParams<{ id: string }>();
-  const [project, setProject] = useState<GuitarProject | undefined>();
-  const [draft, setDraft] = useState<GuitarProject | undefined>();
-  const [hasLoadedProject, setHasLoadedProject] = useState(false);
+  const [project, setProject] = useState<GuitarProject | undefined>(() =>
+    params.id === "demo" ? createDemoProject() : undefined,
+  );
+  const [draft, setDraft] = useState<GuitarProject | undefined>(() =>
+    params.id === "demo" ? createDemoProject() : undefined,
+  );
+  const [hasLoadedProject, setHasLoadedProject] = useState(params.id === "demo");
   const [saveState, setSaveState] = useState("Saved");
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("default");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   useEffect(() => {
+    if (params.id === "demo") {
+      return;
+    }
+
     let active = true;
 
     queueMicrotask(() => {
@@ -43,7 +72,7 @@ export default function ConfigureProjectPage() {
         return;
       }
 
-      const found = getProject(params.id);
+      const found = getProject(params.id) ?? (params.id === "demo" ? createDemoProject() : undefined);
       setProject(found);
       setDraft(found ? { ...found, config: { ...found.config } } : undefined);
       setHasLoadedProject(true);
@@ -61,6 +90,8 @@ export default function ConfigureProjectPage() {
 
     return JSON.stringify(project) !== JSON.stringify(draft);
   }, [project, draft]);
+
+  const canSave = Boolean(draft && (isDirty || draft.id === "demo"));
 
   function updateConfig(field: keyof GuitarConfig, value: string) {
     if (!draft) {
@@ -99,6 +130,12 @@ export default function ConfigureProjectPage() {
       return;
     }
 
+    if (draft.id === "demo") {
+      setProject({ ...draft, updatedAt: new Date().toISOString() });
+      setSaveState("Saved locally for this prototype.");
+      return;
+    }
+
     const { project: saved, result } = updateProject({
       ...draft,
       name: draft.name.trim(),
@@ -132,6 +169,31 @@ export default function ConfigureProjectPage() {
     URL.revokeObjectURL(url);
     setSaveState("Project JSON exported.");
   }
+
+  const optionSet = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    return Object.fromEntries(
+      optionFields.map((field) => {
+        const selected = draft?.config[field];
+        let options = [...guitarOptions[field]];
+
+        if (query) {
+          options = options.filter((option) =>
+            `${field} ${option}`.toLowerCase().includes(query),
+          );
+        }
+
+        if (sortBy === "selected" && selected) {
+          options.sort((a, b) => Number(b === selected) - Number(a === selected));
+        } else if (sortBy === "name") {
+          options.sort((a, b) => a.localeCompare(b));
+        }
+
+        return [field, options];
+      }),
+    ) as Record<keyof GuitarConfig, string[]>;
+  }, [draft, search, sortBy]);
 
   if (!hasLoadedProject) {
     return (
@@ -183,52 +245,62 @@ export default function ConfigureProjectPage() {
           <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-3">
             <Link
               href={`/projects/${draft.id}/summary`}
-              className="rounded-lg border border-zinc-200 bg-white px-3 py-3 text-center text-sm font-semibold text-zinc-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700 sm:px-6"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-3 text-center text-sm font-semibold text-zinc-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700 sm:min-w-32 sm:px-6"
             >
+              <IconFileText aria-hidden="true" className="hidden h-4 w-4 sm:block" stroke={1.8} />
               Summary
             </Link>
             <button
               type="button"
               onClick={downloadProjectJson}
-              className="rounded-lg border border-zinc-200 bg-white px-3 py-3 text-sm font-semibold text-zinc-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700 sm:px-6"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-3 text-sm font-semibold text-zinc-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700 sm:min-w-36 sm:px-6"
             >
+              <IconCode aria-hidden="true" className="hidden h-4 w-4 sm:block" stroke={1.8} />
               Export JSON
             </button>
             <button
               type="button"
               onClick={handleSave}
-              disabled={!isDirty}
-              className="rounded-lg bg-blue-600 px-3 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(37,99,235,0.24)] transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 disabled:shadow-none sm:px-7"
+              disabled={!canSave}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(37,99,235,0.24)] transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 disabled:shadow-none sm:min-w-32 sm:px-7"
             >
+              <IconDeviceFloppy aria-hidden="true" className="hidden h-4 w-4 sm:block" stroke={1.8} />
               Save
             </button>
           </div>
         </div>
       }
     >
-      <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(420px,0.92fr)]">
-        <div className="grid min-w-0 gap-4">
+      <section className="grid gap-4 md:grid-cols-[minmax(0,1fr)_330px] lg:grid-cols-[minmax(0,1fr)_390px] xl:grid-cols-[minmax(0,1fr)_470px]">
+        <div className="grid min-w-0 gap-3">
           <ConfiguratorHeader
             draft={draft}
             savedProject={project}
             saveState={saveState}
             isDirty={isDirty}
             onMetadataChange={updateMetadata}
+            search={search}
+            onSearchChange={setSearch}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
-          <div className="grid gap-3 lg:grid-cols-2">
-            {optionFields.map((field) => (
+          <div className="grid gap-3 min-[1180px]:grid-cols-2">
+            {optionFields.filter((field) => optionSet[field].length > 0).map((field) => (
               <OptionSection
                 key={field}
                 field={field}
                 value={draft.config[field]}
-                options={guitarOptions[field]}
+                options={optionSet[field]}
                 onChange={updateConfig}
+                viewMode={viewMode}
               />
             ))}
           </div>
         </div>
 
-        <aside className="min-w-0 xl:sticky xl:top-4 xl:self-start">
+        <aside className="min-w-0 md:sticky md:top-3 md:self-start">
           <GuitarPreviewPanel project={draft} />
         </aside>
       </section>
