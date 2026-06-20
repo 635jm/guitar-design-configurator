@@ -1,10 +1,12 @@
 import {
   getOptionAsset,
+  getRenderableThumbnailPath,
   type GuitarAssetCategory,
   type GuitarOptionAsset,
 } from "@/lib/guitar-assets";
-import { bodyColorSwatches, type GuitarConfig } from "@/lib/guitars";
-import { IconCheck, IconDots, IconMinus } from "@tabler/icons-react";
+import { type GuitarConfig } from "@/lib/guitars";
+import { IconCheck } from "@tabler/icons-react";
+import Image from "next/image";
 
 type OptionCardProps = {
   field: keyof GuitarConfig;
@@ -13,82 +15,7 @@ type OptionCardProps = {
   onSelect: () => void;
 };
 
-const woodSwatches: Record<string, string> = {
-  Alder: "linear-gradient(135deg,#d9a45e,#f2d198)",
-  Ash: "linear-gradient(135deg,#d29d58,#f7dfae 45%,#b77d39)",
-  Mahogany: "linear-gradient(135deg,#4f1d0d,#8d3f16)",
-  Basswood: "linear-gradient(135deg,#e7bd80,#f7dfb6)",
-  "Maple Top": "linear-gradient(135deg,#e8c984,#fff0bd)",
-  Maple: "linear-gradient(135deg,#f5d9a8,#fff2d2 48%,#d4a05e)",
-  "Roasted Maple": "linear-gradient(135deg,#8c4a19,#c47c37 55%,#71330f)",
-  Walnut: "linear-gradient(135deg,#4f2e1f,#9a6a43)",
-  "Chambered Body": "linear-gradient(135deg,#d5a55d,#80502f)",
-  "Carbon Fiber": "repeating-linear-gradient(45deg,#20242b 0 6px,#111318 6px 12px)",
-};
-
-const pickguardSwatches: Record<string, string> = {
-  "White 1-Ply": "#f8f7f3",
-  "Black 3-Ply": "radial-gradient(circle at 30% 30%,#526071,#111827 32%,#0a0a0a 70%)",
-  "Tortoise 4-Ply": "linear-gradient(135deg,#2b1208,#8d3a17,#d08b45)",
-  "Mint Green 3-Ply": "#d9eadf",
-  White: "#f8f6ef",
-  Black: "#161616",
-  Tortoise: "linear-gradient(135deg,#2b1208,#8d3a17,#d08b45)",
-  "Mint Green": "#d9eadf",
-  Pearl: "linear-gradient(135deg,#f7f1df,#ced7dd,#fff7df)",
-  None: "linear-gradient(135deg,#fff,#f4f4f5)",
-};
-
-const hardwareSwatches: Record<string, string> = {
-  Chrome: "linear-gradient(135deg,#f9fafb,#bfc7cf,#ffffff)",
-  Nickel: "linear-gradient(135deg,#eee4cf,#b7ab93)",
-  Gold: "linear-gradient(135deg,#ffe8a3,#c38b19)",
-  Black: "#111111",
-  "Brushed Steel": "linear-gradient(135deg,#e4e7eb,#929aa3)",
-  "Relic Aged Metal": "linear-gradient(135deg,#b9a98a,#776b58)",
-  Titanium: "linear-gradient(135deg,#dfe7f1,#8995a3)",
-  Brass: "linear-gradient(135deg,#f3d06f,#a97920)",
-};
-
-function getThumbnailStyle(field: keyof GuitarConfig, option: string) {
-  if (field === "bodyColor") {
-    return { background: bodyColorSwatches[option] ?? "#e5e7eb" };
-  }
-
-  if (field === "bodyMaterial" || field === "neckMaterial") {
-    return { background: woodSwatches[option] ?? "#e5e7eb" };
-  }
-
-  if (field === "pickguard") {
-    return { background: pickguardSwatches[option] ?? "#f4f4f5" };
-  }
-
-  if (field === "hardwareFinish") {
-    return { background: hardwareSwatches[option] ?? "#d4d4d8" };
-  }
-
-  return undefined;
-}
-
 function Thumbnail({ field, option }: { field: keyof GuitarConfig; option: string }) {
-  if (option === "Show more") {
-    return <IconDots aria-hidden="true" className="h-5 w-5 text-zinc-500" stroke={1.8} />;
-  }
-
-  const style = getThumbnailStyle(field, option);
-
-  if (style) {
-    return <span className="h-full w-full rounded-md border border-black/5" style={style} />;
-  }
-
-  if (field === "bodyShape") {
-    return (
-      <span className="relative h-11 w-11 rounded-[48%_34%_44%_46%/50%_38%_56%_44%] bg-zinc-400 shadow-inner">
-        <span className="absolute left-7 top-5 h-2 w-7 rounded-full bg-zinc-400" />
-      </span>
-    );
-  }
-
   if (field === "neckShape") {
     return (
       <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-zinc-950">
@@ -97,33 +24,15 @@ function Thumbnail({ field, option }: { field: keyof GuitarConfig; option: strin
     );
   }
 
-  if (field === "pickups") {
-    return (
-      <span className="flex items-center gap-1">
-        {option.replace("Single Coil ", "").split("").map((letter, index) => (
-          <span
-            key={`${letter}-${index}`}
-            className={`block rounded-sm bg-zinc-900 ${
-              letter === "H" ? "h-6 w-5" : "h-6 w-2"
-            }`}
-          />
-        ))}
-      </span>
-    );
-  }
-
-  if (field === "knobs") {
-    return (
-      <span className="grid h-9 w-9 place-items-center rounded-full border border-zinc-300 bg-[radial-gradient(circle_at_35%_28%,#f8fafc,#bfc4ca_48%,#8d939b)] shadow-inner">
-        <span className="h-4 w-px rotate-45 rounded-full bg-zinc-500" />
-      </span>
-    );
-  }
-
   return (
-    <span className="grid h-8 w-12 place-items-center rounded border border-zinc-200 bg-zinc-50 shadow-sm">
-      <IconMinus aria-hidden="true" className="h-4 w-4 text-zinc-400" stroke={1.8} />
-    </span>
+    <Image
+      src={getRenderableThumbnailPath(getAssetCategory(field)!, option)}
+      alt=""
+      width={96}
+      height={60}
+      unoptimized
+      className="h-full w-full rounded-md object-cover"
+    />
   );
 }
 

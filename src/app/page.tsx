@@ -1,6 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { AppShell } from "@/components/app/AppShell";
+import { GuitarLayerStack } from "@/components/preview/GuitarLayerStack";
+import { defaultConfig } from "@/lib/guitars";
 import {
   IconArrowRight,
   IconBox,
@@ -19,7 +20,7 @@ const workflow = [
 const recentPresets = [
   ["Modern S Custom", "Alder / Maple / SSS"],
   ["Vintage Tele", "Ash / Roasted Maple / Black 3-Ply"],
-  ["Jazz Offset", "Mahogany / P90 / Tortoise"],
+  ["Blue Tele Custom", "Basswood / P90 / Tortoise"],
 ];
 
 export default function Home() {
@@ -145,13 +146,12 @@ export default function Home() {
             </Link>
           </div>
           <div className="absolute inset-x-10 bottom-10 top-16">
-            <Image
-              src="/assets/reference/guitar-clean-2.png"
+            <GuitarLayerStack
+              config={defaultConfig}
               alt="Modern black S-style guitar"
-              fill
               priority
-              sizes="420px"
-              className="object-contain drop-shadow-[0_28px_24px_rgba(15,23,42,0.18)]"
+              className="scale-[1.42] transform-gpu"
+              imageClassName="drop-shadow-[0_28px_24px_rgba(15,23,42,0.18)]"
             />
           </div>
         </section>

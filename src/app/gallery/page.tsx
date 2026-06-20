@@ -1,6 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { AppShell } from "@/components/app/AppShell";
+import { GuitarLayerStack } from "@/components/preview/GuitarLayerStack";
+import { guitarPresets } from "@/lib/guitars";
 import {
   IconArrowRight,
   IconBolt,
@@ -16,28 +17,32 @@ const galleryItems = [
     spec: "Trans Black / Black 3-Ply / SSS",
     tone: "Balanced, glassy, studio-ready",
     accent: "bg-blue-50 text-blue-700",
+    config: guitarPresets["Classic Strat"],
   },
   {
     name: "Vintage Tele",
-    spec: "Ash / Nickel / Hardtail",
+    spec: "Olympic White / Nickel / Hardtail",
     tone: "Twangy, simple, bright",
     accent: "bg-amber-50 text-amber-800",
+    config: guitarPresets["Vintage Tele"],
   },
   {
-    name: "Jazz Offset",
-    spec: "Tortoise / P90 / Bigsby",
+    name: "Blue Tele Custom",
+    spec: "Deep Ocean Blue / P90 / Tortoise",
     tone: "Warm, expressive, smooth",
     accent: "bg-emerald-50 text-emerald-700",
+    config: guitarPresets["Jazz Custom"],
   },
   {
     name: "Modern Metal",
-    spec: "Matte Black / HH / Floyd Rose",
+    spec: "Trans Black / HH / Black hardware",
     tone: "Tight, fast, high-output",
     accent: "bg-zinc-100 text-zinc-800",
+    config: guitarPresets["Modern Metal"],
   },
 ];
 
-const filters = ["All", "S-style", "Vintage", "Offset", "High gain"];
+const filters = ["All", "S-style", "T-style", "Vintage", "High gain"];
 
 export default function GalleryPage() {
   return (
@@ -93,20 +98,18 @@ export default function GalleryPage() {
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
         <section className="grid gap-3 md:grid-cols-2">
-          {galleryItems.map((item, index) => (
+          {galleryItems.map((item) => (
             <article
               key={item.name}
               className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.035)] transition hover:border-blue-200"
             >
-              <div className="relative h-48 bg-[radial-gradient(circle_at_50%_28%,#ffffff,#f4f4f5_58%,#e9ebef)]">
-                <Image
-                  src="/assets/reference/guitar-clean-2.png"
-                  alt=""
-                  fill
-                  sizes="(min-width: 768px) 50vw, 100vw"
-                  className={`object-contain object-center p-4 drop-shadow-[0_18px_18px_rgba(15,23,42,0.14)] ${
-                    index === 1 ? "hue-rotate-[18deg]" : index === 2 ? "sepia-[0.25]" : index === 3 ? "grayscale" : ""
-                  }`}
+              <div className="relative h-72 bg-[radial-gradient(circle_at_50%_28%,#ffffff,#f4f4f5_58%,#e9ebef)]">
+                <GuitarLayerStack
+                  config={item.config}
+                  alt={`${item.name} guitar preview`}
+                  priority
+                  className="scale-[1.08] transform-gpu"
+                  imageClassName="drop-shadow-[0_18px_18px_rgba(15,23,42,0.14)]"
                 />
                 <span className={`absolute left-3 top-3 rounded-lg px-2.5 py-1 text-xs font-semibold ${item.accent}`}>
                   Template

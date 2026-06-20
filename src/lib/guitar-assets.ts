@@ -23,19 +23,15 @@ export type GuitarOptionAsset = {
 };
 
 export type PreviewLayerSet = {
-  bodyBase: AssetPath;
-  bodyFinish?: AssetPath;
-  woodGrain?: AssetPath;
+  shadow: AssetPath;
+  body: AssetPath;
   neck?: AssetPath;
-  fretboard?: AssetPath;
   pickguard?: AssetPath;
   pickups?: AssetPath;
   bridge?: AssetPath;
   knobs?: AssetPath;
-  switch?: AssetPath;
-  hardware?: AssetPath;
-  shadow?: AssetPath;
-  glossHighlight?: AssetPath;
+  strings: AssetPath;
+  gloss: AssetPath;
 };
 
 export type GuitarAssetMap = Record<
@@ -51,6 +47,7 @@ export const PREVIEW_LAYER_PLACEHOLDER =
 
 const thumbnailBase = "/assets/guitar/thumbnails";
 const previewBase = "/assets/guitar/preview-layers";
+const visualizerBase = "/assets/visualizer";
 
 const slugByLabel: Record<string, string> = {
   Stratocaster: "stratocaster",
@@ -111,8 +108,8 @@ const slugByLabel: Record<string, string> = {
   HSH: "hsh",
   Hardtail: "hardtail",
   "Tune-o-matic": "tune-o-matic",
-  "2-Point Tremolo": "two-point-tremolo",
-  "6-Saddle Tremolo": "six-saddle-tremolo",
+  "2-Point Tremolo": "2-point-tremolo",
+  "6-Saddle Tremolo": "6-saddle-tremolo",
   "2-point Tremolo": "two-point-tremolo",
   "Floyd Rose": "floyd-rose",
   Bigsby: "bigsby",
@@ -123,6 +120,7 @@ const slugByLabel: Record<string, string> = {
   "Relic Aged Metal": "relic-aged-metal",
   Titanium: "titanium",
   Brass: "brass",
+  "Satin Gold": "satin-gold",
   "Volume Taper": "volume-taper",
   "Tone Taper": "tone-taper",
   "Dome Metal": "dome-metal",
@@ -140,6 +138,8 @@ function getSlug(label: string) {
   );
 }
 
+const assetPath = (path: string) => path as AssetPath;
+
 function makeAsset(
   label: string,
   thumbnailFolder: string,
@@ -150,9 +150,9 @@ function makeAsset(
   return {
     label,
     slug,
-    thumbnailPath: `${thumbnailBase}/${thumbnailFolder}/${slug}.svg`,
+    thumbnailPath: assetPath(`${thumbnailBase}/${thumbnailFolder}/${slug}.svg`),
     previewLayerPath: previewFolder
-      ? `${previewBase}/${previewFolder}/${slug}.png`
+      ? assetPath(`${previewBase}/${previewFolder}/${slug}.png`)
       : undefined,
     fallbackThumbnailPath: THUMBNAIL_PLACEHOLDER,
     fallbackPreviewLayerPath: PREVIEW_LAYER_PLACEHOLDER,
@@ -178,8 +178,8 @@ function makeBodyShapeAsset(label: string): GuitarOptionAsset {
   return {
     label,
     slug,
-    thumbnailPath: `${thumbnailBase}/body-shapes/${slug}.svg`,
-    previewLayerPath: `${previewBase}/bodies/${slug}/body-base.png`,
+    thumbnailPath: assetPath(`${thumbnailBase}/body-shapes/${slug}.svg`),
+    previewLayerPath: assetPath(`${previewBase}/bodies/${slug}/body-base.png`),
     fallbackThumbnailPath: THUMBNAIL_PLACEHOLDER,
     fallbackPreviewLayerPath: PREVIEW_LAYER_PLACEHOLDER,
   };
@@ -192,30 +192,9 @@ function makeBodyShapeAssetGroup(labels: readonly string[]) {
 }
 
 export const guitarAssetMap = {
-  bodyShape: makeBodyShapeAssetGroup(
-    [
-      "Stratocaster",
-      "Telecaster",
-      "Les Paul",
-      "Jazzmaster",
-      "SG",
-      "Flying V",
-      "Explorer",
-      "PRS Style",
-      "Custom Offset",
-    ],
-  ),
+  bodyShape: makeBodyShapeAssetGroup(["Stratocaster", "Telecaster"]),
   bodyMaterial: makeAssetGroup(
-    [
-      "Alder",
-      "Ash",
-      "Mahogany",
-      "Basswood",
-      "Maple Top",
-      "Walnut",
-      "Chambered Body",
-      "Carbon Fiber",
-    ],
+    ["Alder", "Ash", "Mahogany", "Basswood"],
     "body-materials",
     "materials",
   ),
@@ -225,21 +204,7 @@ export const guitarAssetMap = {
     "materials",
   ),
   bodyColor: makeAssetGroup(
-    [
-      "Sonic Blue",
-      "Olympic White",
-      "Trans Black",
-      "Deep Ocean Blue",
-      "Sunburst",
-      "Black",
-      "Candy Apple Red",
-      "Natural",
-      "Surf Green",
-      "Shell Pink",
-      "Matte Black",
-      "Transparent Blue",
-      "Custom Color",
-    ],
+    ["Sonic Blue", "Olympic White", "Trans Black", "Deep Ocean Blue"],
     "finishes",
     "finishes",
   ),
@@ -249,18 +214,13 @@ export const guitarAssetMap = {
       "Black 3-Ply",
       "Tortoise 4-Ply",
       "Mint Green 3-Ply",
-      "White",
-      "Black",
-      "Tortoise",
-      "Mint Green",
-      "Pearl",
       "None",
     ],
     "pickguards",
     "pickguards",
   ),
   pickups: makeAssetGroup(
-    ["Single Coil SSS", "SSS", "HSS", "HH", "P90", "HSH"],
+    ["Single Coil SSS", "HSS", "HH", "P90"],
     "pickups",
     "pickups",
   ),
@@ -270,9 +230,6 @@ export const guitarAssetMap = {
       "Hardtail",
       "6-Saddle Tremolo",
       "Tune-o-matic",
-      "2-point Tremolo",
-      "Floyd Rose",
-      "Bigsby",
     ],
     "bridges",
     "bridges",
@@ -283,10 +240,7 @@ export const guitarAssetMap = {
       "Nickel",
       "Gold",
       "Black",
-      "Brushed Steel",
-      "Relic Aged Metal",
-      "Titanium",
-      "Brass",
+      "Satin Gold",
     ],
     "hardware-finishes",
     "hardware",
@@ -312,32 +266,30 @@ export function getRenderableThumbnailPath(
   category: GuitarAssetCategory,
   option: string,
 ) {
-  return getOptionAsset(category, option).thumbnailPath;
+  return `${visualizerBase}/thumbnails/${categoryToVisualizerThumbnailFolder(category)}/${getSlug(option)}.png` as AssetPath;
 }
 
 export function getPreviewLayers(config: GuitarConfig): PreviewLayerSet {
-  const bodyShape = getOptionAsset("bodyShape", config.bodyShape);
-  const bodyColor = getOptionAsset("bodyColor", config.bodyColor);
-  const bodyMaterial = getOptionAsset("bodyMaterial", config.bodyMaterial);
-  const pickguard = getOptionAsset("pickguard", config.pickguard);
-  const pickups = getOptionAsset("pickups", config.pickups);
-  const bridge = getOptionAsset("bridgeType", config.bridgeType);
-  const hardware = getOptionAsset("hardwareFinish", config.hardwareFinish);
+  const bodyShape = getSlug(config.bodyShape);
+  const bodyColor = getSlug(config.bodyColor);
+  const neckMaterial = getSlug(config.neckMaterial);
+  const pickguard = getSlug(config.pickguard);
+  const pickups = getSlug(config.pickups);
+  const bridge = getSlug(config.bridgeType);
+  const hardware = getSlug(config.hardwareFinish);
+  const knobs = getSlug(config.knobs);
+  const base = `${visualizerBase}/layers/${bodyShape}`;
 
   return {
-    bodyBase: `${previewBase}/bodies/${bodyShape.slug}/body-base.png`,
-    bodyFinish: bodyColor.previewLayerPath,
-    woodGrain: bodyMaterial.previewLayerPath,
-    neck: `${previewBase}/necks/${getSlug(config.neckShape)}.png`,
-    fretboard: `${previewBase}/fretboards/maple.png`,
-    pickguard: pickguard.previewLayerPath,
-    pickups: pickups.previewLayerPath,
-    bridge: bridge.previewLayerPath,
-    knobs: `${previewBase}/knobs/volume-taper.png`,
-    switch: `${previewBase}/switches/blade-switch.png`,
-    hardware: hardware.previewLayerPath,
-    shadow: `${previewBase}/bodies/${bodyShape.slug}/shadow.png`,
-    glossHighlight: `${previewBase}/bodies/${bodyShape.slug}/gloss-highlight.png`,
+    shadow: assetPath(`${base}/shadow.png`),
+    body: assetPath(`${base}/body/${bodyColor}.png`),
+    neck: assetPath(`${base}/neck/${neckMaterial}.png`),
+    pickguard: assetPath(`${base}/pickguard/${pickguard}.png`),
+    pickups: assetPath(`${base}/pickups/${pickups}.png`),
+    bridge: assetPath(`${base}/bridge/${bridge}-${hardware}.png`),
+    knobs: assetPath(`${base}/knobs/${knobs}-${hardware}.png`),
+    strings: assetPath(`${base}/strings.png`),
+    gloss: assetPath(`${base}/gloss.png`),
   };
 }
 
@@ -346,6 +298,22 @@ function categoryToThumbnailFolder(category: GuitarAssetCategory) {
     bodyShape: "body-shapes",
     bodyMaterial: "body-materials",
     neckMaterial: "body-materials",
+    bodyColor: "finishes",
+    pickguard: "pickguards",
+    pickups: "pickups",
+    bridgeType: "bridges",
+    hardwareFinish: "hardware-finishes",
+    knobs: "knobs",
+  };
+
+  return folders[category];
+}
+
+function categoryToVisualizerThumbnailFolder(category: GuitarAssetCategory) {
+  const folders: Record<GuitarAssetCategory, string> = {
+    bodyShape: "body-shapes",
+    bodyMaterial: "body-materials",
+    neckMaterial: "neck-materials",
     bodyColor: "finishes",
     pickguard: "pickguards",
     pickups: "pickups",

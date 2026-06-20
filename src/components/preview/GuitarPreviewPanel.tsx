@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
+import { GuitarLayerStack } from "@/components/preview/GuitarLayerStack";
 import { PreviewToolbar } from "@/components/preview/PreviewToolbar";
 import { type GuitarProject } from "@/lib/guitars";
 import { IconBox, IconMaximize, IconMinimize } from "@tabler/icons-react";
@@ -52,18 +52,17 @@ export function GuitarPreviewPanel({ project }: { project: GuitarProject }) {
 
       <div className="absolute inset-x-0 bottom-20 top-12 grid place-items-center md:bottom-16 md:top-12">
         <div
-          className="relative h-full w-full max-w-[320px] transition-transform duration-300 ease-out"
+          className="relative h-full w-full max-w-[420px] transition-transform duration-300 ease-out"
           style={{
             transform: `rotate(${rotation}deg) scale(${zoom})`,
           }}
         >
-          <Image
-            src="/assets/reference/guitar-clean-2.png"
+          <GuitarLayerStack
+            config={project.config}
             alt={`${project.config.bodyColor} ${project.config.bodyShape} guitar preview`}
-            fill
             priority
-            sizes="(min-width: 1280px) 340px, 280px"
-            className={`object-contain drop-shadow-[0_28px_24px_rgba(15,23,42,0.18)] transition duration-300 ${
+            className="scale-[1.52] transform-gpu"
+            imageClassName={`drop-shadow-[0_28px_24px_rgba(15,23,42,0.18)] transition duration-300 ${
               viewMode === "detail" ? "contrast-110 saturate-110" : ""
             }`}
           />

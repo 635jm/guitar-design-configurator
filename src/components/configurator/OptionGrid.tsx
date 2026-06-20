@@ -30,11 +30,7 @@ export function OptionGrid({
           field={field}
           option={option}
           selected={value === option}
-          onSelect={() => {
-            if (option !== "Show more") {
-              onChange(field, option);
-            }
-          }}
+          onSelect={() => onChange(field, option)}
         />
       ))}
     </div>
