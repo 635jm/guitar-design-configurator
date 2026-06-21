@@ -61,7 +61,7 @@ export function GuitarPreviewPanel({ project }: { project: GuitarProject }) {
             config={project.config}
             alt={`${project.config.bodyColor} ${project.config.bodyShape} guitar preview`}
             priority
-            className="scale-[1.52] transform-gpu"
+            className="scale-[1.04] transform-gpu"
             imageClassName={`drop-shadow-[0_28px_24px_rgba(15,23,42,0.18)] transition duration-300 ${
               viewMode === "detail" ? "contrast-110 saturate-110" : ""
             }`}

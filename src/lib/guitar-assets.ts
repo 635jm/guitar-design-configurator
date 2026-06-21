@@ -34,6 +34,11 @@ export type PreviewLayerSet = {
   gloss: AssetPath;
 };
 
+export type RealisticPreviewAsset = {
+  path: AssetPath;
+  matchedBy: "exact" | "finish" | "shape" | "default";
+};
+
 export type GuitarAssetMap = Record<
   GuitarAssetCategory,
   Record<string, GuitarOptionAsset>
@@ -48,6 +53,7 @@ export const PREVIEW_LAYER_PLACEHOLDER =
 const thumbnailBase = "/assets/guitar/thumbnails";
 const previewBase = "/assets/guitar/preview-layers";
 const visualizerBase = "/assets/visualizer";
+const realisticBase = `${visualizerBase}/realistic`;
 
 const slugByLabel: Record<string, string> = {
   Stratocaster: "stratocaster",
@@ -266,7 +272,111 @@ export function getRenderableThumbnailPath(
   category: GuitarAssetCategory,
   option: string,
 ) {
-  return `${visualizerBase}/thumbnails/${categoryToVisualizerThumbnailFolder(category)}/${getSlug(option)}.png` as AssetPath;
+  return `${realisticBase}/thumbnails/${categoryToVisualizerThumbnailFolder(category)}/${getSlug(option)}.png` as AssetPath;
+}
+
+function previewKey(config: GuitarConfig) {
+  return [
+    getSlug(config.bodyShape),
+    getSlug(config.bodyColor),
+    getSlug(config.pickguard),
+    getSlug(config.pickups),
+    getSlug(config.bridgeType),
+    getSlug(config.hardwareFinish),
+    getSlug(config.neckMaterial),
+  ].join("|");
+}
+
+const exactRealisticPreviews: Record<string, AssetPath> = {
+  [
+    [
+      "stratocaster",
+      "trans-black",
+      "black-3-ply",
+      "single-coil-sss",
+      "2-point-tremolo",
+      "chrome",
+      "maple",
+    ].join("|")
+  ]: assetPath(`${realisticBase}/presets/classic-strat.png`),
+  [
+    [
+      "telecaster",
+      "olympic-white",
+      "black-3-ply",
+      "single-coil-sss",
+      "hardtail",
+      "nickel",
+      "roasted-maple",
+    ].join("|")
+  ]: assetPath(`${realisticBase}/presets/vintage-tele.png`),
+  [
+    [
+      "telecaster",
+      "deep-ocean-blue",
+      "tortoise-4-ply",
+      "p90",
+      "hardtail",
+      "gold",
+      "mahogany",
+    ].join("|")
+  ]: assetPath(`${realisticBase}/presets/blue-tele-custom.png`),
+  [
+    [
+      "stratocaster",
+      "trans-black",
+      "none",
+      "hh",
+      "2-point-tremolo",
+      "black",
+      "wenge",
+    ].join("|")
+  ]: assetPath(`${realisticBase}/presets/modern-metal.png`),
+};
+
+const realisticByShapeAndFinish: Record<string, AssetPath> = {
+  "stratocaster|trans-black": assetPath(`${realisticBase}/presets/classic-strat.png`),
+  "stratocaster|sonic-blue": assetPath(`${realisticBase}/presets/classic-strat.png`),
+  "stratocaster|olympic-white": assetPath(`${realisticBase}/presets/classic-strat.png`),
+  "stratocaster|deep-ocean-blue": assetPath(`${realisticBase}/presets/classic-strat.png`),
+  "telecaster|olympic-white": assetPath(`${realisticBase}/presets/vintage-tele.png`),
+  "telecaster|deep-ocean-blue": assetPath(`${realisticBase}/presets/blue-tele-custom.png`),
+  "telecaster|sonic-blue": assetPath(`${realisticBase}/presets/blue-tele-custom.png`),
+  "telecaster|trans-black": assetPath(`${realisticBase}/presets/vintage-tele.png`),
+};
+
+const realisticByShape: Record<string, AssetPath> = {
+  stratocaster: assetPath(`${realisticBase}/presets/classic-strat.png`),
+  telecaster: assetPath(`${realisticBase}/presets/vintage-tele.png`),
+};
+
+export function getRealisticPreviewAsset(
+  config: GuitarConfig,
+): RealisticPreviewAsset {
+  const bodyShape = getSlug(config.bodyShape);
+  const bodyColor = getSlug(config.bodyColor);
+  const exact = exactRealisticPreviews[previewKey(config)];
+
+  if (exact) {
+    return { path: exact, matchedBy: "exact" };
+  }
+
+  const finish = realisticByShapeAndFinish[`${bodyShape}|${bodyColor}`];
+
+  if (finish) {
+    return { path: finish, matchedBy: "finish" };
+  }
+
+  const shape = realisticByShape[bodyShape];
+
+  if (shape) {
+    return { path: shape, matchedBy: "shape" };
+  }
+
+  return {
+    path: assetPath(`${realisticBase}/presets/classic-strat.png`),
+    matchedBy: "default",
+  };
 }
 
 export function getPreviewLayers(config: GuitarConfig): PreviewLayerSet {

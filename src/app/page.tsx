@@ -150,7 +150,7 @@ export default function Home() {
               config={defaultConfig}
               alt="Modern black S-style guitar"
               priority
-              className="scale-[1.42] transform-gpu"
+              className="scale-[1.05] transform-gpu"
               imageClassName="drop-shadow-[0_28px_24px_rgba(15,23,42,0.18)]"
             />
           </div>

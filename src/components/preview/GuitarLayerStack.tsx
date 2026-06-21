@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { getPreviewLayers } from "@/lib/guitar-assets";
+import { getPreviewLayers, getRealisticPreviewAsset } from "@/lib/guitar-assets";
 import { type GuitarConfig } from "@/lib/guitars";
 
 type GuitarLayerStackProps = {
@@ -23,6 +23,46 @@ const layerOrder = [
 ] as const;
 
 export function GuitarLayerStack({
+  config,
+  alt,
+  priority = false,
+  className = "",
+  imageClassName = "",
+}: GuitarLayerStackProps) {
+  const realisticPreview = getRealisticPreviewAsset(config);
+  const layers = getPreviewLayers(config);
+
+  return (
+    <div
+      className={`relative h-full w-full ${className}`}
+      aria-label={alt}
+      data-preview-match={realisticPreview.matchedBy}
+      role="img"
+    >
+      <img
+        src={realisticPreview.path}
+        alt=""
+        className={`absolute inset-0 h-full w-full object-contain ${imageClassName}`}
+        loading={priority ? "eager" : "lazy"}
+        decoding={priority ? "sync" : "async"}
+        draggable={false}
+      />
+      <noscript>
+        {layerOrder.map((layer) => {
+          const src = layers[layer];
+
+          if (!src) {
+            return null;
+          }
+
+          return <img key={layer} src={src} alt="" />;
+        })}
+      </noscript>
+    </div>
+  );
+}
+
+export function ProceduralGuitarLayerStack({
   config,
   alt,
   priority = false,
