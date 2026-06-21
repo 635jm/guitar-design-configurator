@@ -101,17 +101,17 @@ def closed_curve(points: list[tuple[float, float]], steps: int = 18) -> list[tup
 def body_points(shape: str) -> list[tuple[int, int]]:
     if shape == "Telecaster":
         anchors = [
-            (386, 514), (440, 504), (502, 516), (555, 548), (590, 612),
-            (602, 690), (574, 758), (512, 805), (422, 815), (330, 792),
-            (272, 735), (250, 650), (266, 570), (318, 520), (370, 514),
-            (364, 568), (410, 566), (430, 535),
+            (388, 520), (444, 505), (510, 518), (562, 552), (595, 616),
+            (604, 690), (577, 756), (514, 803), (424, 814), (336, 792),
+            (274, 738), (252, 654), (266, 575), (318, 525), (374, 518),
+            (366, 565), (407, 566), (428, 536),
         ]
     else:
         anchors = [
-            (392, 530), (344, 482), (300, 514), (314, 574), (270, 582),
-            (238, 650), (260, 728), (324, 776), (398, 760), (452, 804),
-            (532, 796), (590, 735), (580, 668), (628, 622), (602, 558),
-            (534, 508), (484, 550), (440, 548),
+            (398, 532), (350, 492), (312, 522), (326, 574), (280, 586),
+            (246, 650), (262, 724), (324, 776), (394, 765), (450, 804),
+            (528, 792), (584, 736), (576, 670), (620, 632), (602, 576),
+            (540, 520), (492, 556), (444, 550),
         ]
     return closed_curve(anchors, 20)
 
@@ -119,13 +119,13 @@ def body_points(shape: str) -> list[tuple[int, int]]:
 def pickguard_points(shape: str) -> list[tuple[int, int]]:
     if shape == "Telecaster":
         anchors = [
-            (382, 540), (512, 536), (548, 590), (534, 666), (472, 704),
-            (372, 684), (334, 612), (352, 566),
+            (382, 543), (502, 538), (542, 588), (532, 662), (476, 700),
+            (374, 684), (338, 615), (352, 570),
         ]
     else:
         anchors = [
-            (380, 536), (462, 530), (548, 572), (574, 646), (538, 725),
-            (445, 728), (366, 686), (332, 604),
+            (382, 540), (460, 532), (540, 570), (566, 640), (532, 710),
+            (450, 724), (372, 682), (340, 608),
         ]
     return closed_curve(anchors, 16)
 
@@ -147,37 +147,36 @@ def draw_woodgrain(
     rng = random.Random(sum(color) + x1 + y1)
     if vertical:
         for x in range(x1, x2, 9):
-            wobble = rng.randint(-9, 9)
+            wobble = rng.randint(-3, 3)
             shade = tuple(max(0, min(255, c + rng.randint(-22, 20))) for c in color)
             draw.line((x, y1, x + wobble, y2), fill=shade + (alpha,), width=rng.choice([1, 1, 2]))
-            draw.arc((x - 38, y1 + 40, x + 42, y2 - 20), 80, 270, fill=shade + (alpha // 2,), width=1)
     else:
-        for y in range(y1, y2, 10):
-            wobble = rng.randint(-10, 10)
+        for y in range(y1, y2, 14):
+            wobble = rng.randint(-6, 6)
             shade = tuple(max(0, min(255, c + rng.randint(-18, 18))) for c in color)
-            draw.arc((x1 - 40, y - 20, x2 + 40, y + 28 + wobble), 180, 356, fill=shade + (alpha,), width=1)
+            draw.arc((x1 - 36, y - 18, x2 + 36, y + 24 + wobble), 180, 356, fill=shade + (alpha,), width=1)
 
 
 def lacquer_checking(draw: ImageDraw.ImageDraw, points: list[tuple[int, int]], color: tuple[int, int, int]) -> None:
     rng = random.Random(len(points) + sum(color))
-    for _ in range(34):
+    for _ in range(24):
         x = rng.randint(285, 585)
         y = rng.randint(548, 770)
         length = rng.randint(20, 72)
         angle = rng.uniform(-0.85, 0.85)
         x2 = x + int(math.cos(angle) * length)
         y2 = y + int(math.sin(angle) * length)
-        draw.line((x, y, x2, y2), fill=(255, 255, 255, 34), width=1)
+        draw.line((x, y, x2, y2), fill=(255, 255, 255, 22), width=1)
 
 
 def edge_wear(draw: ImageDraw.ImageDraw, points: list[tuple[int, int]], seed: int) -> None:
     rng = random.Random(seed)
-    for _ in range(18):
+    for _ in range(16):
         x, y = points[rng.randrange(len(points))]
-        r = rng.randint(3, 9)
-        draw.ellipse((x - r, y - r, x + r, y + r), fill=(202, 154, 89, rng.randint(58, 118)))
+        r = rng.randint(2, 7)
+        draw.ellipse((x - r, y - r, x + r, y + r), fill=(202, 154, 89, rng.randint(45, 95)))
         if rng.random() > 0.45:
-            draw.ellipse((x - r // 2, y - r // 2, x + r // 2, y + r // 2), fill=(74, 48, 29, rng.randint(45, 95)))
+            draw.ellipse((x - r // 2, y - r // 2, x + r // 2, y + r // 2), fill=(74, 48, 29, rng.randint(35, 72)))
 
 
 def draw_body_layer(shape: str, finish: str) -> Image.Image:
@@ -191,7 +190,7 @@ def draw_body_layer(shape: str, finish: str) -> Image.Image:
         shade = tuple(max(0, min(255, c - 16 + shift // 5)) for c in color)
         draw.line((220, y, 650, y), fill=shade + (255,), width=1)
     grain_base = (62, 55, 48) if finish == "Trans Black" else tuple(max(0, c - 32) for c in color)
-    draw_woodgrain(draw, (245, 495, 625, 825), grain_base, 78 if finish == "Trans Black" else 56)
+    draw_woodgrain(draw, (245, 495, 625, 825), grain_base, 34 if finish == "Trans Black" else 26)
     lacquer_checking(draw, points, color)
     edge_wear(draw, points, 1000 + len(shape) + len(finish))
 
@@ -214,17 +213,23 @@ def draw_neck_layer(material: str) -> Image.Image:
     color = NECK_MATERIALS[material]
     neck = (420, 112, 480, 585)
     draw.rounded_rectangle(neck, radius=9, fill=color + (255,), outline=(88, 56, 32, 150), width=2)
-    draw_woodgrain(draw, neck, tuple(max(0, c - 28) for c in color), 96, vertical=True)
+    draw_woodgrain(draw, neck, tuple(max(0, c - 28) for c in color), 52, vertical=True)
 
-    head = [(392, 58), (448, 38), (501, 67), (504, 118), (480, 151), (423, 160), (386, 127)]
+    head = closed_curve(
+        [
+            (408, 60), (452, 42), (498, 56), (522, 88), (510, 124),
+            (474, 136), (462, 158), (424, 158), (398, 130), (384, 96),
+        ],
+        10,
+    )
     draw.polygon(head, fill=color + (255,), outline=(88, 56, 32, 150))
-    draw_woodgrain(draw, (386, 38, 506, 160), tuple(max(0, c - 26) for c in color), 82, vertical=True)
+    draw_woodgrain(draw, (386, 38, 506, 160), tuple(max(0, c - 26) for c in color), 42, vertical=True)
 
     for y in [161, 189, 218, 248, 280, 314, 350, 389, 430, 474, 520, 568]:
         draw.line((421, y, 479, y), fill=(120, 98, 75, 170), width=2)
     for y in [250, 318, 386, 488]:
         draw.ellipse((446, y - 5, 456, y + 5), fill=(38, 33, 28, 220))
-    for x, y in [(386, 80), (383, 104), (390, 130), (512, 76), (516, 102), (507, 128)]:
+    for x, y in [(395, 80), (392, 104), (402, 130), (512, 76), (516, 102), (504, 128)]:
         draw.ellipse((x - 9, y - 9, x + 9, y + 9), fill=(205, 211, 216, 255), outline=(105, 110, 116, 190))
         draw.line((x - 8, y, x + 8, y), fill=(255, 255, 255, 105), width=2)
     return img
